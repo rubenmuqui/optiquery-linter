@@ -1,0 +1,51 @@
+# 🔍 OptiQuery Linter
+
+OptiQuery is a powerful static analysis tool designed to detect database query inefficiencies and anti-patterns in your codebase *before* they reach production. 
+
+By analyzing the Abstract Syntax Tree (AST), it catches performance bottlenecks like the **N+1 query problem**, over-fetching, and unbounded queries without needing to run the code or connect to a database.
+
+## ✨ Features
+
+- **AST-Based Analysis:** Uses `ts-morph` to understand code structure, ignoring formatting or whitespace.
+- **Plugin Architecture:** Designed with Hexagonal Architecture. The core engine is completely agnostic, making it easy to add new rules or support for other ORMs.
+- **Multiple Reporters:** Output results to the terminal for human readability, or generate standard JSON reports for CI/CD pipelines.
+- **Zero Database Required:** Detects Prisma and database bottlenecks entirely offline.
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v18 or higher)
+- TypeScript
+
+### Installation
+*(Note: OptiQuery is currently in development. You can clone and run it locally).*
+
+```bash
+git clone [https://github.com/your-username/optiquery-linter.git](https://github.com/your-username/optiquery-linter.git)
+cd optiquery-linter
+npm install
+```
+
+### Usage
+
+Run the CLI targeting a specific file or directory:
+
+```bash
+# Default human-readable terminal output
+npm run dev -- analyze path/to/your/file.ts
+
+# Generate a JSON report for CI/CD integration
+npm run dev -- analyze path/to/your/file.ts --format json
+```
+
+## 🏗 Architecture
+
+OptiQuery follows a strict separation of concerns:
+- `core/`: The agnostic engine that orchestrates the analysis.
+- `parsers/`: Translates raw source code into an AST.
+- `plugins/`: Contains the specific anti-pattern rules (e.g., Prisma rules).
+- `reporters/`: Handles the output formatting (Console, JSON).
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
