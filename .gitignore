@@ -1,0 +1,12 @@
+# Dependencias (nunca se suben a GitHub, ocupan gigas)
+node_modules/
+
+# Archivos de configuración locales o temporales
+.DS_Store
+Thumbs.db
+
+# Reportes de prueba que genere la herramienta
+optiquery-report.json
+
+# Archivos de log de errores
+*.log
