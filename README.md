@@ -21,7 +21,7 @@ By analyzing the Abstract Syntax Tree (AST), it catches performance bottlenecks 
 *(Note: OptiQuery is currently in development. You can clone and run it locally).*
 
 ```bash
-git clone [https://github.com/your-username/optiquery-linter.git](https://github.com/your-username/optiquery-linter.git)
+git clone [https://github.com/rubenmuqui/optiquery-linter.git](https://github.com/rubenmuqui/optiquery-linter.git)
 cd optiquery-linter
 npm install
 ```
