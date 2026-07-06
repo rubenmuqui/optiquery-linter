@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import { OptiQueryEngine } from '../core/engine.js';
 import { TypeScriptParser } from '../parsers/typescript/index.js';
 import { noNPlusOneRule } from '../plugins/prisma/no-n-plus-one.js';
+import { noOverFetchingRule } from '../plugins/prisma/no-over-feching.js';
 import { ConsoleReporter } from '../reporters/console.js';
 import { JsonReporter } from '../reporters/json.js';
 
@@ -25,6 +26,7 @@ program.command('analyze')
             const parser = new TypeScriptParser();
 
             engine.registerRule(noNPlusOneRule);
+            engine.registerRule
             const ast = parser.parseFile(path);
             const issues = engine.execute(ast, path);
 
