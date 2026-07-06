@@ -33,8 +33,14 @@ program
         engine.registerRule(rule);
       });
 
-      const ast = parser.parseFile(path);
-      const issues = engine.execute(ast, path);
+      const sourceFiles = parser.parse(path);
+      const allIssues: any[] = [];
+
+      sourceFiles.forEach((sourceFile) => {
+        const filePath = sourceFile.getFilePath();
+        const issues = engine.execute(sourceFile, filePath);
+        allIssues.push(...issues);
+      });
 
       let reporter;
       if (options.format.toLowerCase() === 'json') {
@@ -43,7 +49,7 @@ program
         reporter = new ConsoleReporter();
       }
 
-      reporter.report(issues);
+      reporter.report(allIssues);
 
     } catch (error: any) {
       console.error(chalk.red(`\n❌ Error analyzing file: ${error.message}\n`));

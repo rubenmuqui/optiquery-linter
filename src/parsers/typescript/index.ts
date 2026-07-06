@@ -1,4 +1,6 @@
 import { Project, SourceFile } from 'ts-morph';
+import fs from 'fs';
+import path from 'path';
 
 export class TypeScriptParser {
     private project: Project;
@@ -7,7 +9,15 @@ export class TypeScriptParser {
         this.project = new Project();
     }
 
-    public parseFile(filePath: string): SourceFile {
-        return this.project.addSourceFileAtPath(filePath);
+    public parse(targetPath: string): SourceFile[] {
+        const stats = fs.statSync(targetPath);
+
+        if (stats.isDirectory()) {
+            const globPath = path.posix.join(targetPath.replace(/\\/g, '/'), '**/*.ts');
+            this.project.addSourceFilesAtPaths(globPath);
+        } else {
+            this.project.addSourceFileAtPath(targetPath);;
+        }
+        return this.project.getSourceFiles();
     }
 }
