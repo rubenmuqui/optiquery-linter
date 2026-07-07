@@ -22,7 +22,7 @@ export const noNPlusOneRule: LinterRule = {
                     ruleId: 'prisma/no-n-plus-one',
                     message: `N + 1 query detected: ${badCall.getText()}`,
                     file: filePath,
-                    line: loop.getStartLineNumber(),
+                    line: badCall.getStartLineNumber(),
                     suggestion: "Extract the query outside the loop using 'findMany' with an 'in' clause."
                 });
             }
