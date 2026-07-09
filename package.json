@@ -16,10 +16,12 @@
   "dependencies": {
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
+    "node-sql-parser": "^5.4.0",
     "ts-morph": "^22.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.9",
+    "@types/node-sql-parser": "^1.0.0",
     "tsx": "^4.16.2",
     "typescript": "^5.5.3",
     "vitest": "^4.1.10"
