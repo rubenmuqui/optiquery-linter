@@ -1,5 +1,5 @@
 import type { LinterRule, LinterIssue } from '../../core/types.js';
-import { SyntaxKind, SourceFile, CallExpression } from 'ts-morph';
+import { SyntaxKind, SourceFile } from 'ts-morph';
 import { Parser } from 'node-sql-parser';
 
 export const noSelectStarRule: LinterRule = {
@@ -11,52 +11,53 @@ export const noSelectStarRule: LinterRule = {
     const sourceFile = astNode as SourceFile;
     const sqlParser = new Parser();
 
-    const callExpressions = sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression);
+    const analyzeSqlString = (sqlString: string, lineNumber: number) => {
+      try {
+        const sqlAst = sqlParser.astify(sqlString);
+        const statements = Array.isArray(sqlAst) ? sqlAst : [sqlAst];
 
-    for (const call of callExpressions) {
-      const functionName = call.getExpression().getText();
-      
-
-      if (functionName.endsWith('$queryRaw') || functionName.endsWith('query')) {
-        
-        const args = call.getArguments();
-        let sqlString = '';
-
-        if (args.length > 0 && args[0]?.isKind(SyntaxKind.StringLiteral)) {
-          sqlString = args[0].getText().replace(/['"`]/g, ''); 
-        } else if (args.length > 0 && args[0]?.isKind(SyntaxKind.NoSubstitutionTemplateLiteral)) {
-           sqlString = args[0].getText().replace(/`/g, '');
-        }
-
-        if (sqlString) {
-          try {
-            const sqlAst = sqlParser.astify(sqlString);
+        for (const stmt of statements) {
+          if (stmt.type === 'select') {
+            const columns: any = stmt.columns; 
+            const hasStar = columns === '*' || (
+              Array.isArray(columns) && 
+              columns.some((col: any) => col.expr?.type === 'column_ref' && col.expr?.column === '*')
+            );
             
-            const statements = Array.isArray(sqlAst) ? sqlAst : [sqlAst];
-
-            for (const stmt of statements) {
-              if (stmt.type === 'select') {
-                const columns: any = stmt.columns; 
-                
-                const hasStar = columns === '*' || (
-                  Array.isArray(columns) && 
-                  columns.some((col: any) => col.expr?.type === 'column_ref' && col.expr?.column === '*')
-                );
-                
-                if (hasStar) {
-                  issues.push({
-                    ruleId: 'sql/no-select-star',
-                    message: `Inefficient SQL detected: Avoid using 'SELECT *' in raw queries.`,
-                    file: filePath,
-                    line: call.getStartLineNumber(),
-                    suggestion: "Specify the exact columns you need (e.g., 'SELECT id, name FROM ...') to reduce bandwidth and memory."
-                  });
-                }
-              }
+            if (hasStar) {
+              issues.push({
+                ruleId: 'sql/no-select-star',
+                message: `Inefficient SQL detected: Avoid using 'SELECT *' in raw queries.`,
+                file: filePath,
+                line: lineNumber,
+                suggestion: "Specify the exact columns you need (e.g., 'SELECT id, name FROM ...') to reduce bandwidth and memory."
+              });
             }
-          } catch (error) {
           }
         }
+      } catch (error) {
+      }
+    };
+
+    const callExpressions = sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression);
+    for (const call of callExpressions) {
+      const functionName = call.getExpression().getText();
+      if (functionName.endsWith('query')) {
+        const args = call.getArguments();
+        if (args.length > 0 && args[0]?.isKind(SyntaxKind.StringLiteral)) {
+          const sqlString = args[0].getText().slice(1, -1);
+          analyzeSqlString(sqlString, call.getStartLineNumber());
+        }
+      }
+    }
+
+    const taggedTemplates = sourceFile.getDescendantsOfKind(SyntaxKind.TaggedTemplateExpression);
+    for (const tagged of taggedTemplates) {
+      const tag = tagged.getTag().getText();
+      if (tag.endsWith('$queryRaw')) {
+        const template = tagged.getTemplate();
+        const sqlString = template.getText().slice(1, -1);
+        analyzeSqlString(sqlString, tagged.getStartLineNumber());
       }
     }
 
