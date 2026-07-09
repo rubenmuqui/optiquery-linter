@@ -1,6 +1,7 @@
 import type { LinterRule, LinterIssue } from '../../core/types.js';
 import { SyntaxKind, SourceFile } from 'ts-morph';
-import { Parser } from 'node-sql-parser';
+import pkg from 'node-sql-parser';
+const { Parser } = pkg;
 
 export const noSelectStarRule: LinterRule = {
   id: 'sql/no-select-star',
