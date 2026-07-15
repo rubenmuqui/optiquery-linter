@@ -13,30 +13,48 @@ export const noOrderByRandRule: LinterRule = {
     const sqlParser = new Parser();
 
     const analyzeSqlString = (sqlString: string, lineNumber: number) => {
+      let hasRand = false;
+
       try {
         const sqlAst = sqlParser.astify(sqlString);
         const statements = Array.isArray(sqlAst) ? sqlAst : [sqlAst];
 
         for (const stmt of statements) {
           if (stmt.type === 'select' && stmt.orderby) {
-            const hasRand = stmt.orderby.some((order: any) => {
-              const funcName = order.expr?.name?.toUpperCase();
-              return (order.expr?.type === 'aggr_func' || order.expr?.type === 'function') && 
+            hasRand = stmt.orderby.some((order: any) => {
+              if (!order.expr) return false;
+              
+              let funcName = '';
+              if (typeof order.expr.name === 'string') {
+                funcName = order.expr.name.toUpperCase();
+              } else if (order.expr.name?.value) {
+                funcName = String(order.expr.name.value).toUpperCase();
+              } else if (Array.isArray(order.expr.name)) {
+                funcName = String(order.expr.name[0]?.value || '').toUpperCase();
+              }
+
+              return (order.expr.type === 'aggr_func' || order.expr.type === 'function') && 
                      (funcName === 'RAND' || funcName === 'RANDOM');
             });
-            
-            if (hasRand) {
-              issues.push({
-                ruleId: 'sql/no-order-by-rand',
-                message: `Inefficient SQL detected: ORDER BY RAND() causes severe performance degradation.`,
-                file: filePath,
-                line: lineNumber,
-                suggestion: "Avoid sorting by random in the database. Fetch an array of IDs, randomize them in memory, or use sequential logic."
-              });
-            }
           }
         }
-      } catch (error) {}
+      } catch (error) {
+      }
+
+
+      if (!hasRand && /ORDER\s+BY\s+(RAND|RANDOM)\s*\(/i.test(sqlString)) {
+        hasRand = true;
+      }
+
+      if (hasRand) {
+        issues.push({
+          ruleId: 'sql/no-order-by-rand',
+          message: `Inefficient SQL detected: ORDER BY RAND() causes severe performance degradation.`,
+          file: filePath,
+          line: lineNumber,
+          suggestion: "Avoid sorting by random in the database. Fetch an array of IDs, randomize them in memory, or use sequential logic."
+        });
+      }
     };
 
     const callExpressions = sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression);
