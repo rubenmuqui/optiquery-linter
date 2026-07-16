@@ -2,13 +2,17 @@
   "name": "optiquery-linter",
   "version": "1.0.0",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "description": "",
   "bin": {
-    "optiquery": "./src/cli/index.ts"
+    "optiquery": "./dist/cli/index.js"
   },
   "scripts": {
     "dev": "tsx src/cli/index.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "build": "tsup",
+    "prepublishOnly": "npm run build && npm run test"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +26,7 @@
   "devDependencies": {
     "@types/node": "^20.14.9",
     "@types/node-sql-parser": "^1.0.0",
+    "tsup": "^8.5.1",
     "tsx": "^4.16.2",
     "typescript": "^5.5.3",
     "vitest": "^4.1.10"

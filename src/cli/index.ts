@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { Command } from 'commander';
 import chalk from 'chalk';
 
@@ -29,17 +31,15 @@ program
       const engine = new OptiQueryEngine();
       const parser = new TypeScriptParser();
 
-      recommendedRules.forEach((rule) => {
-        engine.registerRule(rule);
-      });
+      engine.registerRules(recommendedRules);
 
       const sourceFiles = parser.parse(path);
       const allIssues: any[] = [];
 
       sourceFiles.forEach((sourceFile) => {
         const filePath = sourceFile.getFilePath();
-        const issues = engine.execute(sourceFile, filePath);
-        allIssues.push(...issues);
+        const issues = engine.analyzeFile(filePath); 
+       allIssues.push(...issues);
       });
 
       let reporter;
