@@ -30,26 +30,22 @@ export class OptiQueryEngine {
       issues.push(...rule.analyze(sourceFile, filePath, isFixMode));
     }
 
-
     const fileLines = sourceFile.getFullText().split(/\r?\n/);
-
     issues = issues.filter(issue => {
       const prevLineIndex = issue.line - 2;
-      
       if (prevLineIndex >= 0) {
         const prevLineText = fileLines[prevLineIndex] || '';
-        
         if (prevLineText.includes('// optiquery-disable-next-line')) {
           return false; 
         }
       }
-      return true; 
+      return true;
     });
 
     if (isFixMode) {
       sourceFile.saveSync();
     }
-    
+
     return issues;
   }
 }
