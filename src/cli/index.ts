@@ -17,7 +17,7 @@ cli
     
     console.log(`Analyzing ${path}...${isFixMode ? '  (Auto-fix enabled)' : ''}`);
     
-    const issues = engine.analyzeFile(path, isFixMode);
+    const issues = engine.analyzePath(path, isFixMode);
 
     const unresolvedIssues = issues.filter(issue => !issue.fixed);
     const fixedCount = issues.length - unresolvedIssues.length;

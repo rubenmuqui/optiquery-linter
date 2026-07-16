@@ -1,4 +1,5 @@
 import { Project, SourceFile } from 'ts-morph';
+import fs from 'node:fs';
 import type { LinterRule, LinterIssue } from './types.js';
 
 export class OptiQueryEngine {
@@ -13,9 +14,26 @@ export class OptiQueryEngine {
     this.rules = rules;
   }
 
-  analyzeFile(filePath: string, isFixMode: boolean = false): LinterIssue[] {
-    const sourceFile = this.project.addSourceFileAtPath(filePath);
-    return this.analyzeSource(sourceFile, filePath, isFixMode);
+  analyzePath(targetPath: string, isFixMode: boolean = false): LinterIssue[] {
+    this.project = new Project();
+
+    const stat = fs.statSync(targetPath);
+
+    if (stat.isDirectory()) {
+
+      const globPath = targetPath.replace(/\\/g, '/').replace(/\/$/, '') + '/**/*.ts';
+      this.project.addSourceFilesAtPaths(globPath);
+    } else {
+      this.project.addSourceFileAtPath(targetPath);
+    }
+
+    let allIssues: LinterIssue[] = [];
+
+    for (const sourceFile of this.project.getSourceFiles()) {
+      allIssues.push(...this.analyzeSource(sourceFile, sourceFile.getFilePath(), isFixMode));
+    }
+
+    return allIssues;
   }
 
   analyzeCode(code: string, fileName: string = 'temp.ts', isFixMode: boolean = false): LinterIssue[] {
