@@ -1,51 +1,61 @@
-# 🔍 OptiQuery Linter
+# 🚀 OptiQuery Linter
 
-OptiQuery is a powerful static analysis tool designed to detect database query inefficiencies and anti-patterns in your codebase *before* they reach production. 
+A powerful, static code analysis tool designed to detect performance bottlenecks and dangerous SQL/ORM anti-patterns in TypeScript projects. 
 
-By analyzing the Abstract Syntax Tree (AST), it catches performance bottlenecks like the **N+1 query problem**, over-fetching, and unbounded queries without needing to run the code or connect to a database.
+OptiQuery Linter analyzes your Abstract Syntax Tree (AST) to catch database inefficiencies *before* they reach production, supporting both raw SQL queries and Prisma ORM.
 
 ## ✨ Features
+* 🔍 **Zero-runtime overhead:** Analyzes code statically via AST (`ts-morph`).
+* ⚡ **Performance focused:** Detects N+1 queries, Over-fetching, and `ORDER BY RAND()`.
+* 🛡️ **Safety first:** Prevents catastrophic unbounded `UPDATE` and `DELETE` mutations.
+* 📦 **Multi-target:** Understands generic SQL (`node-sql-parser`) and Prisma template literals.
 
-- **AST-Based Analysis:** Uses `ts-morph` to understand code structure, ignoring formatting or whitespace.
-- **Plugin Architecture:** Designed with Hexagonal Architecture. The core engine is completely agnostic, making it easy to add new rules or support for other ORMs.
-- **Multiple Reporters:** Output results to the terminal for human readability, or generate standard JSON reports for CI/CD pipelines.
-- **Zero Database Required:** Detects Prisma and database bottlenecks entirely offline.
+## 📦 Installation
 
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js (v18 or higher)
-- TypeScript
-
-### Installation
-*(Note: OptiQuery is currently in development. You can clone and run it locally).*
+You can install OptiQuery Linter globally to use it across all your projects:
 
 ```bash
-git clone [https://github.com/rubenmuqui/optiquery-linter.git](https://github.com/rubenmuqui/optiquery-linter.git)
-cd optiquery-linter
-npm install
+npm install -g optiquery-linter
 ```
 
-### Usage
-
-Run the CLI targeting a specific file or directory:
+Or install it as a development dependency in a specific project:
 
 ```bash
-# Default human-readable terminal output
-npm run dev -- analyze path/to/your/file.ts
-
-# Generate a JSON report for CI/CD integration
-npm run dev -- analyze path/to/your/file.ts --format json
+npm install -D optiquery-linter
 ```
 
-## 🏗 Architecture
+## 🚀 Usage
 
-OptiQuery follows a strict separation of concerns:
-- `core/`: The agnostic engine that orchestrates the analysis.
-- `parsers/`: Translates raw source code into an AST.
-- `plugins/`: Contains the specific anti-pattern rules (e.g., Prisma rules).
-- `reporters/`: Handles the output formatting (Console, JSON).
+Run the linter pointing it to your TypeScript files or directories:
 
-## 📄 License
+```bash
+# Analyze a specific file
+optiquery analyze src/database/queries.ts
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+# Analyze an entire directory (via npx if installed locally)
+npx optiquery analyze ./src
+```
+
+### Bypassing Rules
+If you have a legitimate reason to bypass a rule (e.g., a specific migration script), you can silence the linter for a specific line using the following comment:
+
+```typescript
+// optiquery-disable-next-line
+const users = await db.query("SELECT * FROM users");
+```
+
+## 📏 Supported Rules
+
+### Prisma ORM
+* `prisma/no-n-plus-one`: Detects loops containing database queries.
+* `prisma/no-over-fetching`: Prevents `findMany` without a `select` clause.
+* `prisma/no-unbounded-query`: Flags queries lacking `take` or `limit` constraints.
+
+### Raw SQL
+* `sql/no-select-star`: Detects the use of `SELECT *` (Over-fetching).
+* `sql/no-unbounded-modify`: Prevents `UPDATE` or `DELETE` without a `WHERE` clause.
+* `sql/no-order-by-rand`: Flags inefficient random sorting (`ORDER BY RAND()`).
+* `sql/no-implicit-insert`: Detects `INSERT` statements lacking explicit column names.
+
+## 🎓 About
+This project was developed as a Final Degree Project (TFG) in Software Engineering, focusing on code quality, static analysis, and database performance optimization.

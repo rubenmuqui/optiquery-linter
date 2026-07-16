@@ -10,3 +10,5 @@ optiquery-report.json
 
 # Archivos de log de errores
 *.log
+
+dist/
