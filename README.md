@@ -26,22 +26,25 @@ npm install -D optiquery-linter
 
 ## 🚀 Usage
 
-Run the linter pointing it to your TypeScript files or directories:
+The recommended way to run OptiQuery Linter is using `npx`, which requires no global installation:
 
 ```bash
 # Analyze a specific file
-optiquery analyze src/database/queries.ts
+npx optiquery-linter analyze src/database/queries.ts
 
-# Analyze an entire directory (via npx if installed locally)
-npx optiquery analyze ./src
+# Analyze an entire directory
+npx optiquery-linter analyze ./src
 ```
 
-### Bypassing Rules
-If you have a legitimate reason to bypass a rule (e.g., a specific migration script), you can silence the linter for a specific line using the following comment:
+### Local Installation (Recommended for Teams)
+To ensure all developers in your team use the same version, install it as a development dependency:
 
-```typescript
-// optiquery-disable-next-line
-const users = await db.query("SELECT * FROM users");
+```bash
+npm install -D optiquery-linter
+```
+Once installed, you can add it to your `package.json` scripts or run it locally via:
+```bash
+npx optiquery analyze ./src
 ```
 
 ## 📏 Supported Rules
