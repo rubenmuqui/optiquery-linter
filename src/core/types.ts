@@ -4,12 +4,13 @@ export interface LinterIssue {
     file: string;
     line: number;
     suggestion?: string;
+    fixed?: boolean;
 }
 
 export interface LinterRule {
     id: string;
     description: string;
-    analyze: (astNode: any, filePath: string) => LinterIssue[];
+    analyze: (astNode: any, filePath: string, isFixMode?: boolean) => LinterIssue[];
 }
 
 export interface LinterReporter {

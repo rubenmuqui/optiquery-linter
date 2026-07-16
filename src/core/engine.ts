@@ -13,21 +13,21 @@ export class OptiQueryEngine {
     this.rules = rules;
   }
 
-  analyzeFile(filePath: string): LinterIssue[] {
+  analyzeFile(filePath: string, isFixMode: boolean = false): LinterIssue[] {
     const sourceFile = this.project.addSourceFileAtPath(filePath);
-    return this.analyzeSource(sourceFile, filePath);
+    return this.analyzeSource(sourceFile, filePath, isFixMode);
   }
 
-  analyzeCode(code: string, fileName: string = 'temp.ts'): LinterIssue[] {
+  analyzeCode(code: string, fileName: string = 'temp.ts', isFixMode: boolean = false): LinterIssue[] {
     const sourceFile = this.project.createSourceFile(fileName, code, { overwrite: true });
-    return this.analyzeSource(sourceFile, fileName);
+    return this.analyzeSource(sourceFile, fileName, isFixMode);
   }
 
-  private analyzeSource(sourceFile: SourceFile, filePath: string): LinterIssue[] {
+  private analyzeSource(sourceFile: SourceFile, filePath: string, isFixMode: boolean): LinterIssue[] {
     let issues: LinterIssue[] = [];
 
     for (const rule of this.rules) {
-      issues.push(...rule.analyze(sourceFile, filePath));
+      issues.push(...rule.analyze(sourceFile, filePath, isFixMode));
     }
 
 
@@ -46,6 +46,10 @@ export class OptiQueryEngine {
       return true; 
     });
 
+    if (isFixMode) {
+      sourceFile.saveSync();
+    }
+    
     return issues;
   }
 }

@@ -1,59 +1,41 @@
 #!/usr/bin/env node
-
-import { Command } from 'commander';
-import chalk from 'chalk';
-
+import { cac } from 'cac';
 import { OptiQueryEngine } from '../core/engine.js';
-import { TypeScriptParser } from '../parsers/typescript/index.js';
-
 import { recommendedRules } from '../plugins/index.js';
 
-import { ConsoleReporter } from '../reporters/console.js';
-import { JsonReporter } from '../reporters/json.js';
+const cli = cac('optiquery');
 
-const program = new Command();
+cli
+  .command('analyze <fileOrDirectory>', 'Analyze TypeScript files for SQL/Prisma anti-patterns')
+  .option('--fix', 'Automatically fix safe-to-fix issues')
+  .action((path: string, options: { fix?: boolean }) => {
+    const engine = new OptiQueryEngine();
+    
+    engine.registerRules(recommendedRules);
 
-program
-  .name('optiquery')
-  .description('Static analysis linter to detect database query inefficiencies')
-  .version('1.0.0');
+    const isFixMode = options.fix || false;
+    
+    console.log(`Analyzing ${path}...${isFixMode ? '  (Auto-fix enabled)' : ''}`);
+    
+    const issues = engine.analyzeFile(path, isFixMode);
 
-program
-  .command('analyze')
-  .description('Analyze a file or directory for anti-patterns (e.g., N+1 query problem)')
-  .argument('<path>', 'Path to the target file or directory')
-  .option('-f, --format <type>', 'Output format (console or json)', 'console')
-  .action((path, options) => {
-    console.log(chalk.blue.bold(`\n🔍 Starting OptiQuery Linter v1.0`));
-    console.log(chalk.gray(`Scanning target: ${path}...\n`));
+    const unresolvedIssues = issues.filter(issue => !issue.fixed);
+    const fixedCount = issues.length - unresolvedIssues.length;
 
-    try {
-      const engine = new OptiQueryEngine();
-      const parser = new TypeScriptParser();
+    if (fixedCount > 0) {
+      console.log(`Auto-fixed ${fixedCount} issues!`);
+    }
 
-      engine.registerRules(recommendedRules);
-
-      const sourceFiles = parser.parse(path);
-      const allIssues: any[] = [];
-
-      sourceFiles.forEach((sourceFile) => {
-        const filePath = sourceFile.getFilePath();
-        const issues = engine.analyzeFile(filePath); 
-       allIssues.push(...issues);
+    if (unresolvedIssues.length === 0) {
+      console.log('No unresolved issues found!');
+    } else {
+      console.log(`Found ${unresolvedIssues.length} unresolved issues:`);
+      unresolvedIssues.forEach(issue => {
+        console.log(`- [${issue.ruleId}] ${issue.file}:${issue.line} -> ${issue.message}`);
       });
-
-      let reporter;
-      if (options.format.toLowerCase() === 'json') {
-        reporter = new JsonReporter();
-      } else {
-        reporter = new ConsoleReporter();
-      }
-
-      reporter.report(allIssues);
-
-    } catch (error: any) {
-      console.error(chalk.red(`\n❌ Error analyzing file: ${error.message}\n`));
+      process.exit(1); 
     }
   });
 
-program.parse();
+cli.help();
+cli.parse();
