@@ -60,6 +60,7 @@ const users = await db.query("SELECT * FROM users");
 * `prisma/no-unbounded-query`: Flags queries lacking `take` or `limit` constraints. **[🔧 Supports Auto-fix]**
 * `prisma/no-deprecated-find-one`: Replaces deprecated `.findOne()` with `.findUnique()`. **[🔧 Supports Auto-fix]**
 * `prisma/no-unbounded-mutation`: Prevents `updateMany`/`deleteMany` without a restrictive `where` clause.
+* `prisma/no-offset-pagination-without-order`: Detects `skip` + `take` pagination without a deterministic `orderBy`.
 
 ### Raw SQL
 * `sql/no-select-star`: Detects the use of `SELECT *` (Over-fetching).
