@@ -10,6 +10,7 @@ import { noSelectStarRule } from './sql/no-select-star.js';
 import { noUnboundedModifyRule } from './sql/no-unbounded-modify.js'; 
 import { noOrderByRandRule } from './sql/no-order-by-rand.js';
 import { noImplicitInsertRule }  from './sql/no-implicit-insert.js';
+import { noDynamicQueryConcatRule } from './sql/no-dynamic-query-concat.js';
 
 export const recommendedRules: LinterRule[] = [
   noNPlusOneRule,
@@ -21,5 +22,6 @@ export const recommendedRules: LinterRule[] = [
   noSelectStarRule,
   noUnboundedModifyRule,
   noOrderByRandRule,
-  noImplicitInsertRule
+  noImplicitInsertRule,
+  noDynamicQueryConcatRule
 ];

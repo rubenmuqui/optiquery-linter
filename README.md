@@ -67,6 +67,7 @@ const users = await db.query("SELECT * FROM users");
 * `sql/no-unbounded-modify`: Prevents `UPDATE` or `DELETE` without a `WHERE` clause.
 * `sql/no-order-by-rand`: Flags inefficient random sorting (`ORDER BY RAND()`).
 * `sql/no-implicit-insert`: Detects `INSERT` statements lacking explicit column names.
+* `sql/no-dynamic-query-concat`: Detects dynamic SQL concatenation/interpolation in raw queries.
 
 ## 🎓 About
 This project was developed as a Final Degree Project (TFG) in Software Engineering, focusing on code quality, static analysis, and database performance optimization.
