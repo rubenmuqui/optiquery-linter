@@ -58,16 +58,13 @@ const users = await db.query("SELECT * FROM users");
 * `prisma/no-n-plus-one`: Detects loops containing database queries.
 * `prisma/no-over-fetching`: Prevents `findMany` without a `select` clause.
 * `prisma/no-unbounded-query`: Flags queries lacking `take` or `limit` constraints. **[🔧 Supports Auto-fix]**
+* `prisma/no-unbounded-mutation`: Protects against massive, unconstrained updates or deletes.
+* `prisma/no-offset-pagination-without-order`: Ensures paginated queries include an `orderBy` clause to prevent inconsistent or duplicate results.
 * `prisma/no-deprecated-find-one`: Replaces deprecated `.findOne()` with `.findUnique()`. **[🔧 Supports Auto-fix]**
-* `prisma/no-unbounded-mutation`: Prevents `updateMany`/`deleteMany` without a restrictive `where` clause.
-* `prisma/no-offset-pagination-without-order`: Detects `skip` + `take` pagination without a deterministic `orderBy`.
 
 ### Raw SQL
 * `sql/no-select-star`: Detects the use of `SELECT *` (Over-fetching).
 * `sql/no-unbounded-modify`: Prevents `UPDATE` or `DELETE` without a `WHERE` clause.
 * `sql/no-order-by-rand`: Flags inefficient random sorting (`ORDER BY RAND()`).
 * `sql/no-implicit-insert`: Detects `INSERT` statements lacking explicit column names.
-* `sql/no-dynamic-query-concat`: Detects dynamic SQL concatenation/interpolation in raw queries.
-
-## 🎓 About
-This project was developed as a Final Degree Project (TFG) in Software Engineering, focusing on code quality, static analysis, and database performance optimization.
+* `sql/no-dynamic-query-concat`: Prevents SQL injection risks and caching issues by flagging dynamic string concatenation in queries.
