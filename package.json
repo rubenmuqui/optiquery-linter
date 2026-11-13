@@ -2,24 +2,68 @@
   "name": "optiquery-linter",
   "version": "1.0.0",
   "type": "module",
+  "description": "Static analysis for TypeScript projects that catches inefficient SQL and Prisma queries (N+1, over-fetching, unbounded mutations) before they reach production.",
+  "license": "MIT",
+  "author": "Rubén Muñoz Quirós <munozquirosruben@gmail.com>",
+  "homepage": "https://github.com/rubenmuqui/optiquery-linter#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rubenmuqui/optiquery-linter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rubenmuqui/optiquery-linter/issues"
+  },
+  "keywords": [
+    "linter",
+    "static-analysis",
+    "ast",
+    "sql",
+    "prisma",
+    "typescript",
+    "database",
+    "performance",
+    "n+1",
+    "cli"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "description": "",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./plugins": {
+      "types": "./dist/plugins/index.d.ts",
+      "import": "./dist/plugins/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "bin": {
     "optiquery": "./dist/cli/index.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "tsx src/cli/index.ts",
-    "test": "vitest run",
     "build": "tsup",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepack": "npm run build",
     "prepublishOnly": "npm run build && npm run test"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
+    "cac": "^6.7.14",
     "chalk": "^5.3.0",
-    "commander": "^12.1.0",
     "node-sql-parser": "^5.4.0",
     "ts-morph": "^22.0.0"
   },

@@ -12,3 +12,5 @@ optiquery-report.json
 *.log
 
 dist/
+# Tarballs de npm
+*.tgz
