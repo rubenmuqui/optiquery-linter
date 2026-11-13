@@ -1,8 +1,15 @@
 # 🚀 OptiQuery Linter
 
+[![npm version](https://img.shields.io/npm/v/optiquery-linter.svg)](https://www.npmjs.com/package/optiquery-linter)
+[![npm downloads](https://img.shields.io/npm/dm/optiquery-linter.svg)](https://www.npmjs.com/package/optiquery-linter)
+[![license](https://img.shields.io/npm/l/optiquery-linter.svg)](./LICENSE)
+[![node](https://img.shields.io/node/v/optiquery-linter.svg)](https://nodejs.org)
+
 A powerful, static code analysis tool designed to detect performance bottlenecks and dangerous SQL/ORM anti-patterns in TypeScript projects. 
 
 OptiQuery Linter analyzes your Abstract Syntax Tree (AST) to catch database inefficiencies *before* they reach production, supporting both raw SQL queries and Prisma ORM.
+
+Requires Node.js 18 or newer.
 
 ## ✨ Features
 * 🔍 **Zero-runtime overhead:** Analyzes code statically via AST (`ts-morph`).
@@ -33,6 +40,21 @@ Once installed, you can add it to your `package.json` scripts or run it locally 
 ```bash
 npx optiquery analyze ./src
 ```
+
+### Library Usage
+The engine and the rules are also exported, so you can run the analysis from your own tooling:
+
+```typescript
+import { OptiQueryEngine, recommendedRules, ConsoleReporter } from "optiquery-linter";
+
+const engine = new OptiQueryEngine();
+engine.registerRules(recommendedRules);
+
+const issues = engine.analyzePath("./src");
+new ConsoleReporter().report(issues);
+```
+
+Individual rule sets are available from `optiquery-linter/plugins`.
 
 ## 🚀 Usage
 
@@ -68,3 +90,22 @@ const users = await db.query("SELECT * FROM users");
 * `sql/no-order-by-rand`: Flags inefficient random sorting (`ORDER BY RAND()`).
 * `sql/no-implicit-insert`: Detects `INSERT` statements lacking explicit column names.
 * `sql/no-dynamic-query-concat`: Prevents SQL injection risks and caching issues by flagging dynamic string concatenation in queries.
+## 🛠️ Development
+
+```bash
+npm install
+npm run build      # bundles dist/ with tsup
+npm run test       # vitest, 33 tests
+npm run typecheck  # tsc --noEmit
+npm run dev -- analyze ./tests   # run the CLI from source
+```
+
+Publishing is gated: `prepublishOnly` runs the build and the full test suite, and `prepack`
+rebuilds `dist/` so the tarball never ships stale output.
+
+```bash
+npm version patch        # or minor / major
+npm publish              # requires npm login with access to the package
+```
+
+The published tarball contains only `dist/`, `README.md` and `LICENSE` (see the `files` field).
